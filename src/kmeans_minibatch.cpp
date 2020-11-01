@@ -134,7 +134,7 @@ void MiniBatchKmeans::initCentroids()
      */
 }
 
-void MiniBatchKmeans::fit(int max_no_improvement)
+cv::Point MiniBatchKmeans::fit(int max_no_improvement)
 {
     int i, j, t, b, c;
     double eta, eta_min = -1;
@@ -190,13 +190,16 @@ void MiniBatchKmeans::fit(int max_no_improvement)
         }
 
         if (no_improvement == max_no_improvement) {
+            cout<<Centroids[0][0]<<", "<<Centroids[0][1];
             break;
         }
     }
     labelDataWithCenter();
-    
-    std::cout << "K, batch_size, error, iter_num\n";
-    cout << K << ", " << batch_size << ", " << calculateError() << ", " << t << endl;
+    #ifdef NDEBUG
+        std::cout << "K, batch_size, error, iter_num\n";
+        cout << K << ", " << batch_size << ", " << calculateError() << ", " << t << endl;
+    #endif
+    return cv::Point(Centroids[0][0],Centroids[0][1]);
 }
 
 /* Private functions */

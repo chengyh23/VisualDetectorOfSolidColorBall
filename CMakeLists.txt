@@ -41,6 +41,8 @@ add_library(kmeans src/kmeans_minibatch.cpp)
 target_link_libraries(color
     ${catkin_LIBRARIES}
 )
+add_executable(localtest src/localtest.cpp)
+target_link_libraries(localtest color kmeans)
 
 add_executable(hik_cam_node node/hik_cam_node.cpp)
 target_link_libraries(hik_cam_node hik_cam color kmeans)

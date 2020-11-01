@@ -1,8 +1,0 @@
-prefix=/home/d402/hikvision_ros/devel
-
-Name: hikvision_ros
-Description: Description of hikvision_ros
-Version: 0.0.1
-Cflags: -I/home/d402/hikvision_ros/include
-Libs: -L${prefix}/lib 
-Requires: 

@@ -58,7 +58,7 @@ public:
     MiniBatchKmeans(Data *data_obj, int K, int max_iter, int batch_size);
     
     void initCentroids();
-    void fit(int max_no_improvement);
+    cv::Point fit(int max_no_improvement);
     bool labelDataWithCenter();
     double calculateError();
     

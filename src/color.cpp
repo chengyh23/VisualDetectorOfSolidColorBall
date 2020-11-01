@@ -3,6 +3,7 @@
 //
 #include "color.h"
 #include "kmeans_minibatch.h"
+#include <iostream>
 
 // 1440/1080 = 4/3
 // 40x30
@@ -12,23 +13,27 @@ int GRID_NUMCOLS = 40;
 int GRID_NUMROWS = 30;
 int GRID_WIDTH = WIDTH/GRID_NUMCOLS;
 int GRID_HEIGHT = HEIGHT/GRID_NUMROWS;
+int GRID_MARGIN_HEIGHT = 10;
+int GRID_MARGIN_WIDTH = 5;
 CvSize GRID_SIZE = cvSize(GRID_WIDTH,GRID_HEIGHT);
 
 bool inRange(int x,int min,int max){
     return (x<max) && (x>min);
 }
 Point getCentroid(std::vector<Point> listOfPoints){
-    for(int i=0;i<listOfPoints.size();i++){
-        Data *d = new Data(listOfPoints.size(),2);
-        d->loadData(listOfPoints);
-        int K=2;
-        MiniBatchKmeans *mbk = new MiniBatchKmeans(d, K, MAX_ITER, BATCH_SIZE);
-        //mbk->check();
-        mbk->initCentroids();
-        mbk->fit(MAX_NO_IMPROVEMENT);
-        delete d;
-        delete mbk;
-    }
+    Data *d = new Data(listOfPoints.size(),2);
+    d->loadData(listOfPoints);
+    int K=2;
+    MiniBatchKmeans *mbk = new MiniBatchKmeans(d, K, MAX_ITER, BATCH_SIZE);
+    //mbk->check();
+    mbk->initCentroids();
+    Point centroid = mbk->fit(MAX_NO_IMPROVEMENT);
+    delete d;
+    delete mbk;
+    Point ret;
+    ret.x = (int)(centroid.x * GRID_WIDTH);
+    ret.y = (int)(centroid.y * GRID_HEIGHT);
+    return ret;
 }
 
 // 根据单点像素RGB值判断颜色
@@ -84,26 +89,48 @@ COLOR colorDetectBlock(Mat img,int offset_col,int offset_row){
 COLOR colorDetect(Mat img){
     // YGBR
     std::vector<std::vector<Point>> colorList(4);
-    for(int ii=0;ii<GRID_NUMCOLS;ii++){
-        for(int jj=0;jj<GRID_NUMROWS;jj++){
+    for(int ii=GRID_MARGIN_WIDTH;ii<GRID_NUMCOLS-GRID_MARGIN_WIDTH;ii++){
+        for(int jj=GRID_MARGIN_HEIGHT;jj<GRID_NUMROWS-GRID_MARGIN_HEIGHT;jj++){
             COLOR c = colorDetectBlock(img,ii*GRID_WIDTH,jj*GRID_HEIGHT);
 //            printf("%d",c);
             // COLOR为UNDEFINED
             if(c==4) continue;
             colorList[c].push_back(Point(ii,jj));
+            switch (c){
+                case 0://YELLOW
+                    circle(img,cv::Point(ii*GRID_WIDTH,jj*GRID_HEIGHT),10,Scalar(100,100,100));break;
+                case 1://GREEN
+                    circle(img,cv::Point(ii*GRID_WIDTH,jj*GRID_HEIGHT),10,Scalar(0,255,0));break;
+                case 2://BLUE
+                    circle(img,cv::Point(ii*GRID_WIDTH,jj*GRID_HEIGHT),10,Scalar(255,0,0));break;
+                case 3://RED
+                    circle(img,cv::Point(ii*GRID_WIDTH,jj*GRID_HEIGHT),10,Scalar(0,0,255));break;
+            }
         }
     }
     CvFont font;
     cvInitFont(&font,CV_FONT_BLACK,1.0F,1.0F);
     for(int i=0;i<colorList.size();i++){
         // 没有被标记为该颜色的block
-        if(colorList[i].size()==0) continue;
+        if(colorList[i].size()<10) continue;
         Point centroid = getCentroid(colorList[i]);
-        circle(img,centroid,60,Scalar(0,0,255));
+        switch (i){
+//            case 0://YELLOW
+//                circle(img,centroid,60,Scalar(100,100,100));break;
+            case 1://GREEN
+                circle(img,centroid,5,Scalar(0,255,0),5);break;
+//            case 2://BLUE
+//                circle(img,centroid,60,Scalar(255,0,0));break;
+            case 3://RED
+                circle(img,centroid,5,Scalar(0,0,255),5);break;
+        }
+
+
         // IplImage ipl = IplImage(img);
         // cvPutText(&ipl,"BBB",centroid,&font,Scalar(0,0,255));
-        imshow("position",img);waitKey(0);
     }
+    imshow("position",img);waitKey(50);// 毫秒
+    return UNDEFINED;
 }
 
 
