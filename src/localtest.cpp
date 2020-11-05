@@ -36,6 +36,8 @@ int main(int argc,char* argv[])
         if(img.empty()){
             cout<<" failed to read / empty"<<endl;
             break;
+        }else{
+            cout<<endl;
         }
         // 海天线检测
         cv::Point h1(0, 0), h2(0, 0);
@@ -55,6 +57,6 @@ int main(int argc,char* argv[])
         cv::resize(img,tmp,cv::Size (1280,720));
 
         namedWindow("position",0);
-        imshow("position",img);waitKey(0);// 毫秒
+        imshow("position",tmp);waitKey(0);// 毫秒
     }
 }

@@ -34,20 +34,27 @@ void HikvisionCamera::decodeCallback(int nPort, char *pBuf, int nSize, FRAME_INF
 
         
         /*
-        COLOR color = colorDetect(picBGR);
-        switch (color) {
-            case YELLOW:
-                ROS_INFO("YELLOW");break;
-            case GREEN:
-                ROS_INFO("GREEN");break;
-            case BLACK:
-                ROS_INFO("BLACK");break;
-            case RED:
-                ROS_INFO("RED");break;
-            default: 
-                ROS_INFO("UNDEFINED");
+        
+        */
+        std::vector<std::vector<Point>> colorList = colorDetect(picBGR);
+        for(int i=0;i<colorList.size();i++){
+            cv::Rect roi_rect = drawColorCirclesRect(picBGR,colorList[i],COLOR(i));
+            if(roi_rect!=cv::Rect()){
+                switch (i) {
+                    case YELLOW:
+                        ROS_INFO("YELLOW");break;
+                    case GREEN:
+                        ROS_INFO("GREEN");break;
+                    case BLACK:
+                        ROS_INFO("BLACK");break;
+                    case RED:
+                        ROS_INFO("RED");break;
+                    default: 
+                        ROS_INFO("UNDEFINED");
+                }
+            }
+            drawBlockColorCircle(picBGR,colorList[i],COLOR(i));
         }
-         */
 
         const char* root_path="/home/d402/hikvision_ros/img_cache/";
         char path[256]={0};
@@ -320,7 +327,7 @@ void HikvisionCamera::initROSIO(ros::NodeHandle& priv_node)
 
     SetCameraInfoSrv = priv_node.advertiseService(camera_name+"/set_camera_info",&HikvisionCamera::setCameraInfo,this);
 }
-/*
+
 void HikvisionCamera::run()
 {
     ros::NodeHandle priv_node("~");
@@ -332,7 +339,7 @@ void HikvisionCamera::run()
         ros::spin();
     }
 }
- */
+ /*
 void HikvisionCamera::run() {
     ros::NodeHandle priv_node("~");
 
@@ -360,7 +367,7 @@ void HikvisionCamera::run() {
         rate.sleep();
     }
 }
-
+*/
 HikvisionCamera::~HikvisionCamera()
 {
 

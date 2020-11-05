@@ -26,6 +26,7 @@ include_directories(
 
 link_directories(lib)
 
+# ADD LIBRARY
 add_library(hik_cam src/hik_cam.cpp)
 target_link_libraries(hik_cam
     ${catkin_LIBRARIES}
@@ -42,10 +43,18 @@ target_link_libraries(color
     ${catkin_LIBRARIES}
 )
 add_library(seaskyline src/seaskyline.cpp)
-add_library(shape src/shape.cpp)
 
+add_library(shape src/shape.cpp)
+target_link_libraries(shape
+    ${OpenCV_LIBS}
+)
+
+# ADD EXECUTABLE
 add_executable(localtest src/localtest.cpp)
 target_link_libraries(localtest color kmeans seaskyline shape)
+
+add_executable(shapetest src/shapetest.cpp)
+target_link_libraries(shapetest shape)
 
 add_executable(hik_cam_node node/hik_cam_node.cpp)
 target_link_libraries(hik_cam_node hik_cam color kmeans)
