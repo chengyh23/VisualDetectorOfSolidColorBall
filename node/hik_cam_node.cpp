@@ -1,4 +1,4 @@
-#include "hik_cam.h"
+#include "../include/hik_cam.h"
 
 int main(int argc, char** argv)
 {

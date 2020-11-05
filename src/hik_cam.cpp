@@ -1,4 +1,4 @@
-#include "hik_cam.h"
+#include "../include/hik_cam.h"
 #include "color.h"
 #include "kmeans_minibatch.h"
 
@@ -33,7 +33,7 @@ void HikvisionCamera::decodeCallback(int nPort, char *pBuf, int nSize, FRAME_INF
         cv::cvtColor(picYV12, picBGR, cv::COLOR_YUV2BGR_YV12);
 
         
-        //------
+        /*
         COLOR color = colorDetect(picBGR);
         switch (color) {
             case YELLOW:
@@ -47,6 +47,7 @@ void HikvisionCamera::decodeCallback(int nPort, char *pBuf, int nSize, FRAME_INF
             default: 
                 ROS_INFO("UNDEFINED");
         }
+         */
 
         const char* root_path="/home/d402/hikvision_ros/img_cache/";
         char path[256]={0};
@@ -222,7 +223,11 @@ bool HikvisionCamera::initHikSDK()
         ROS_INFO("[%s] Login fail, get: %s",camera_name.c_str(), get_error_str(NET_DVR_GetLastError()).c_str());
         return false;
     }
+    return true;
 
+
+}
+bool HikvisionCamera::setRealPlayCallBack(){
     //Set callback function of getting stream.
     NET_DVR_PREVIEWINFO struPlayInfo = {0};
     struPlayInfo.hPlayWnd     = 0;
@@ -230,9 +235,6 @@ bool HikvisionCamera::initHikSDK()
     struPlayInfo.dwLinkMode   = link_mode;
     struPlayInfo.bBlocked     = 1;
     struPlayInfo.dwDisplayBufNum = 1;
-
-
-
 
     data_play_handler = NET_DVR_RealPlay_V40(user_id, &struPlayInfo, nullptr, nullptr);
 
@@ -261,11 +263,8 @@ bool HikvisionCamera::initHikSDK()
     }
 
     else ROS_INFO("[%s] Set Data Callback successully.",camera_name.c_str());
-    
-    
     return true;
 }
-
 void HikvisionCamera::initROSIO(ros::NodeHandle& priv_node)
 {
     /// camera parameter
@@ -321,19 +320,45 @@ void HikvisionCamera::initROSIO(ros::NodeHandle& priv_node)
 
     SetCameraInfoSrv = priv_node.advertiseService(camera_name+"/set_camera_info",&HikvisionCamera::setCameraInfo,this);
 }
-
+/*
 void HikvisionCamera::run()
 {
     ros::NodeHandle priv_node("~");
 
     initROSIO(priv_node);
 
-    if(initHikSDK())
+    if(initHikSDK()&&setRealPlayCallBack())
     {
         ros::spin();
     }
-    
-    
+}
+ */
+void HikvisionCamera::run() {
+    ros::NodeHandle priv_node("~");
+
+    initROSIO(priv_node);
+    if(!initHikSDK()) return;
+
+    NET_DVR_SetCapturePictureMode(1);// JPEG mode
+    sensor_msgs::CameraInfoPtr ci(new sensor_msgs::CameraInfo(camera_info_mgr->getCameraInfo()));
+    ci->header = camera_info_mgr->getCameraInfo().header;
+    ci->header.stamp = ros::Time::now();
+
+    ros::Rate rate(2);
+    while(ros::ok()){
+        DWORD dwPicSize = image_width * image_height;
+        char pPicBuf[dwPicSize];
+        DWORD lpSizeReturned;
+        if(NET_DVR_CapturePictureBlock_New(user_id, pPicBuf, dwPicSize, &lpSizeReturned)){
+            cv::Mat pic = cv::Mat(image_height,image_width,CV_8UC3,pPicBuf);
+
+            sensor_msgs::ImagePtr msg = cv_bridge::CvImage(ci->header, "bgr8", pic).toImageMsg();
+            // publish the image
+            image_pub.publish(*msg, *ci);
+        }
+        ROS_INFO("NET_DVR_CapturePictureBlock_New");
+        rate.sleep();
+    }
 }
 
 HikvisionCamera::~HikvisionCamera()

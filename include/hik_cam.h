@@ -68,7 +68,7 @@ private:
     bool setCameraInfo(sensor_msgs::SetCameraInfo::Request& req, sensor_msgs::SetCameraInfo::Response& rsp);
 
     bool initHikSDK();
-
+    bool setRealPlayCallBack();
     void initROSIO(ros::NodeHandle& priv_node);
 
 

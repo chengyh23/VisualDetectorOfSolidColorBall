@@ -6,17 +6,18 @@
 #include <string>
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgcodecs.hpp>
-#include "color.h"
-
+#include "../include/color.h"
+#include "../include/seaskyline.h"
+#include "../include/shape.h"
 using namespace std;
 
 int main(int argc,char* argv[])
 {
     if(argc<2){
         cout<<"input local frames path directory"<<endl;
+        return 0;
     }
     string filePath = argv[1];
-    system("ls |grep .jpg > imgs.txt");
     ifstream file;
     file.open(filePath+"imgs.txt",ios::in);
 
@@ -36,7 +37,24 @@ int main(int argc,char* argv[])
             cout<<" failed to read / empty"<<endl;
             break;
         }
+        // 海天线检测
+        cv::Point h1(0, 0), h2(0, 0);
+        find_horinzon_line(img, 0, 0.0, 2.0, h1, h2);
+        cv::line(img,h1,h2,Scalar(255,0,0),2,cv::LINE_AA);
 
-        COLOR result = colorDetect(img);
+        std::vector<std::vector<Point>> colorList = colorDetect(img);
+        for(int i=0;i<colorList.size();i++){
+            cv::Rect roi_rect = drawColorCirclesRect(img,colorList[i],COLOR(i));
+//            if(!roi_rect.empty()){
+//                cv::Mat roi = img(roi_rect);
+//                circleDetect(roi);
+//            }
+            drawBlockColorCircle(img,colorList[i],COLOR(i));
+        }
+        cv::Mat tmp;
+        cv::resize(img,tmp,cv::Size (1280,720));
+
+        namedWindow("position",0);
+        imshow("position",img);waitKey(0);// 毫秒
     }
 }

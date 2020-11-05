@@ -11,7 +11,7 @@
 #include "opencv2/opencv.hpp"
 
 #define DEBUGMSG false
-#define MAX_ITER 100
+#define MAX_ITER 500
 #define BATCH_SIZE 16
 #define MAX_NO_IMPROVEMENT 50
 using namespace std;

@@ -41,8 +41,11 @@ add_library(kmeans src/kmeans_minibatch.cpp)
 target_link_libraries(color
     ${catkin_LIBRARIES}
 )
+add_library(seaskyline src/seaskyline.cpp)
+add_library(shape src/shape.cpp)
+
 add_executable(localtest src/localtest.cpp)
-target_link_libraries(localtest color kmeans)
+target_link_libraries(localtest color kmeans seaskyline shape)
 
 add_executable(hik_cam_node node/hik_cam_node.cpp)
 target_link_libraries(hik_cam_node hik_cam color kmeans)
