@@ -57,4 +57,4 @@ add_executable(shapetest src/shapetest.cpp)
 target_link_libraries(shapetest shape)
 
 add_executable(hik_cam_node node/hik_cam_node.cpp)
-target_link_libraries(hik_cam_node hik_cam color kmeans)
+target_link_libraries(hik_cam_node hik_cam color kmeans seaskyline)

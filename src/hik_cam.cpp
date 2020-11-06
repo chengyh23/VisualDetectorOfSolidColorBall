@@ -1,5 +1,6 @@
 #include "../include/hik_cam.h"
 #include "color.h"
+#include "seaskyline.h"
 #include "kmeans_minibatch.h"
 
 std::string HikvisionCamera::expandUserPath(std::string path)
@@ -33,30 +34,42 @@ void HikvisionCamera::decodeCallback(int nPort, char *pBuf, int nSize, FRAME_INF
         cv::cvtColor(picYV12, picBGR, cv::COLOR_YUV2BGR_YV12);
 
         int x=rand()%16+1;
+        if(x!=1) return;
         if(x==1){
+            cv::Point h1(0, 0), h2(0, 0);
+            find_horinzon_line(picBGR, 0, 0.0, 2.0, h1, h2);
+            cv::line(picBGR,h1,h2,Scalar(255,0,0),2,cv::LINE_AA);
             std::vector<std::vector<Point>> colorList = colorDetect(picBGR);
-            int flag=0;
+            std::vector<std::vector<Point>> colorListFilered;
             for(int i=0;i<colorList.size();i++){
-                cv::Rect roi_rect = drawColorCirclesRect(picBGR,colorList[i],COLOR(i));
+                std::vector<Point> colorPoints = filterByLine(h1,h2,colorList[i]);
+                colorListFilered.push_back(colorPoints);
+            }
+            
+
+            int flag=0;
+            char outcolorstr[256]={0};
+            for(int i=0;i<colorListFilered.size();i++){
+                cv::Rect roi_rect = drawColorCirclesRect(picBGR,colorListFilered[i],COLOR(i));
                 if(roi_rect!=cv::Rect()){
                     flag=1;
                     switch (i) {
                         case YELLOW:
-                            printf("YELLOW  ");break;
+                            sprintf(outcolorstr,"YELLOW  ");break;
                         case GREEN:
-                            printf("GREEN   ");break;
+                            sprintf(outcolorstr,"GREEN   ");break;
                         case BLACK:
-                            printf("BLACK   ");break;
+                            sprintf(outcolorstr,"BLACK   ");break;
                         case RED:
-                            printf("RED ");break;
-                        default:
-                            printf("UNDEFINED   ");
+                            sprintf(outcolorstr,"RED ");break;
+                        
                     }
                 }
-                drawBlockColorCircle(picBGR,colorList[i],COLOR(i));
+                drawBlockColorCircle(picBGR,colorListFilered[i],COLOR(i));
             }
-            if(flag==0) printf("\n");
-            else printf("NO BALL\n");
+            
+            if(flag==0) ROS_INFO("NO BALL");
+            else ROS_INFO(outcolorstr);
         }
 
         const char* root_path="/home/d402/hikvision_ros/img_cache/";

@@ -31,4 +31,6 @@ double line_angle(double x1, double y1, double x2, double y2);
 double linear_fit(double x1, double y1, double x2, double y2, double x3);
 void find_horinzon_line(cv::Mat img, int start_row, double pre_angle, double angle_thr, cv::Point &p1,
                                               cv::Point &p2);
+
+std::vector<cv::Point> filterByLine(cv::Point h1,cv::Point h2,std::vector<cv::Point> points);
 #endif //SEASKYLINE_H

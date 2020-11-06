@@ -1,0 +1,30 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../include/kmeans_minibatch.h
+iostream
+-
+fstream
+-
+string
+-
+cmath
+-
+iomanip
+-
+stdlib.h
+-
+stdio.h
+-
+opencv2/opencv.hpp
+../include/opencv2/opencv.hpp
+
+/home/d402/visual/src/kmeans_minibatch.cpp
+kmeans_minibatch.h
+/home/d402/visual/src/kmeans_minibatch.h
+
