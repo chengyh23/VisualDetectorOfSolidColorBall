@@ -36,21 +36,25 @@ void HikvisionCamera::decodeCallback(int nPort, char *pBuf, int nSize, FRAME_INF
         int x=rand()%16+1;
         if(x!=1) return;
         if(x==1){
+            // 海天线检测
             cv::Point h1(0, 0), h2(0, 0);
             find_horinzon_line(picBGR, 0, 0.0, 2.0, h1, h2);
             cv::line(picBGR,h1,h2,Scalar(255,0,0),2,cv::LINE_AA);
+            // 检测颜色，返回colorList
             std::vector<std::vector<Point>> colorList = colorDetect(picBGR);
+            // 根据海天线过滤colorList，得到colorListFiltered
             std::vector<std::vector<Point>> colorListFilered;
             for(int i=0;i<colorList.size();i++){
                 std::vector<Point> colorPoints = filterByLine(h1,h2,colorList[i]);
                 colorListFilered.push_back(colorPoints);
             }
-            
-
+            // 利用colorListFiltered
             int flag=0;
             char outcolorstr[256]={0};
             for(int i=0;i<colorListFilered.size();i++){
-                cv::Rect roi_rect = drawColorCirclesRect(picBGR,colorListFilered[i],COLOR(i));
+                drawBlockColorCircle(picBGR,colorListFilered[i],COLOR(i));
+                cv::Rect roi_rect = getColorCirclesRect(colorListFilered[i]);
+                drawColorCirclesRect(picBGR,roi_rect,COLOR(i));
                 if(roi_rect!=cv::Rect()){
                     flag=1;
                     switch (i) {
@@ -65,7 +69,7 @@ void HikvisionCamera::decodeCallback(int nPort, char *pBuf, int nSize, FRAME_INF
                         
                     }
                 }
-                drawBlockColorCircle(picBGR,colorListFilered[i],COLOR(i));
+
             }
             
             if(flag==0) ROS_INFO("NO BALL");

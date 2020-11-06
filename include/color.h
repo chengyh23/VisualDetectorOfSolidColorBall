@@ -12,12 +12,16 @@ double thR=0.4;
 double thY=0.85;
 double thG=0.3;
 double thB=0.3;
+int STDERR_THRESH=100;
 //// 根据单点像素RGB值判断颜色
 //COLOR colorClassify(int r,int g, int b);
 int getMaxMin(vector<int> x,int& max,int& min,int& maxIdx,int& minIdx);
+float computeGridStdErr(Mat img,int offset_col,int offset_row);
 
-cv::Rect drawColorCirclesRect(Mat& img,const std::vector<cv::Point> colorList,COLOR c);
 void drawBlockColorCircle(Mat& img,const std::vector<cv::Point> colorList,COLOR c);
-// 根据单张图片各像素颜色统计数值判断该帧颜色
+
+cv::Rect getColorCirclesRect(const std::vector<cv::Point> colorList);
+void drawColorCirclesRect(Mat& img,cv::Rect rect,COLOR c);
+
 std::vector<std::vector<Point>> colorDetect(Mat& img);
 #endif //BALL_DETECTOR_COLOR_H

@@ -236,8 +236,9 @@ void find_horinzon_line(cv::Mat img, int start_row, double pre_angle, double ang
 std::vector<cv::Point> filterByLine(cv::Point h1,cv::Point h2,std::vector<cv::Point> points){
     int y1 = h1.y;
     int y2 = h2.y;
-    // 取较低的作为y的阈值
-    int y_thresh = (y1>y2) ? y1 : y2;
+//    // 取较高的作为y的阈值
+//    int y_thresh = (y1<y2) ? y1 : y2;
+    float y_thresh = (y1+y2)/2.0;
     std::vector<cv::Point> ret;
     for(int i=0;i<points.size();i++){
         if(points[i].y * GRID_HEIGHT < y_thresh){// 在海天线上方

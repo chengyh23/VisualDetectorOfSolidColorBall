@@ -9,6 +9,7 @@
 #include "../include/color.h"
 #include "../include/seaskyline.h"
 #include "../include/shape.h"
+#include "../include/detect_pipeline.h"
 using namespace std;
 
 int main(int argc,char* argv[])
@@ -39,20 +40,7 @@ int main(int argc,char* argv[])
         }else{
             cout<<endl;
         }
-        // 海天线检测
-        cv::Point h1(0, 0), h2(0, 0);
-        find_horinzon_line(img, 0, 0.0, 2.0, h1, h2);
-        cv::line(img,h1,h2,Scalar(255,0,0),2,cv::LINE_AA);
-
-        std::vector<std::vector<Point>> colorList = colorDetect(img);
-        for(int i=0;i<colorList.size();i++){
-            cv::Rect roi_rect = drawColorCirclesRect(img,colorList[i],COLOR(i));
-//            if(!roi_rect.empty()){
-//                cv::Mat roi = img(roi_rect);
-//                circleDetect(roi);
-//            }
-            drawBlockColorCircle(img,colorList[i],COLOR(i));
-        }
+        detect_pipeline(img);
         cv::Mat tmp;
         cv::resize(img,tmp,cv::Size (1280,720));
 

@@ -1,8 +1,0 @@
-prefix=/usr/local
-
-Name: hikvision_ros
-Description: Description of hikvision_ros
-Version: 0.0.1
-Cflags: -I${prefix}/include
-Libs: -L${prefix}/lib 
-Requires: 
