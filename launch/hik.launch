@@ -9,8 +9,8 @@
 <arg name="link_mode" default="0"/>
 
 
-<arg name="image_width" default="1280"/>
-<arg name="image_height" default="720"/>
+<arg name="image_width" default="2560"/>
+<arg name="image_height" default="1440"/>
 <arg name="camera_frame_id" default="hik_camera"/>
 <arg name="camera_name" default="hik_camera"/>
 <arg name="camera_info_url" default=""/>

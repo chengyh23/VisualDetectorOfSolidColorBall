@@ -32,28 +32,31 @@ void HikvisionCamera::decodeCallback(int nPort, char *pBuf, int nSize, FRAME_INF
         cv::Mat picYV12 = cv::Mat(pFrameInfo->nHeight * 3/2, pFrameInfo->nWidth, CV_8UC1, pBuf);
         cv::cvtColor(picYV12, picBGR, cv::COLOR_YUV2BGR_YV12);
 
-        
-        /*
-        
-        */
-        std::vector<std::vector<Point>> colorList = colorDetect(picBGR);
-        for(int i=0;i<colorList.size();i++){
-            cv::Rect roi_rect = drawColorCirclesRect(picBGR,colorList[i],COLOR(i));
-            if(roi_rect!=cv::Rect()){
-                switch (i) {
-                    case YELLOW:
-                        ROS_INFO("YELLOW");break;
-                    case GREEN:
-                        ROS_INFO("GREEN");break;
-                    case BLACK:
-                        ROS_INFO("BLACK");break;
-                    case RED:
-                        ROS_INFO("RED");break;
-                    default: 
-                        ROS_INFO("UNDEFINED");
+        int x=rand()%16+1;
+        if(x==1){
+            std::vector<std::vector<Point>> colorList = colorDetect(picBGR);
+            int flag=0;
+            for(int i=0;i<colorList.size();i++){
+                cv::Rect roi_rect = drawColorCirclesRect(picBGR,colorList[i],COLOR(i));
+                if(roi_rect!=cv::Rect()){
+                    flag=1;
+                    switch (i) {
+                        case YELLOW:
+                            printf("YELLOW  ");break;
+                        case GREEN:
+                            printf("GREEN   ");break;
+                        case BLACK:
+                            printf("BLACK   ");break;
+                        case RED:
+                            printf("RED ");break;
+                        default:
+                            printf("UNDEFINED   ");
+                    }
                 }
+                drawBlockColorCircle(picBGR,colorList[i],COLOR(i));
             }
-            drawBlockColorCircle(picBGR,colorList[i],COLOR(i));
+            if(flag==0) printf("\n");
+            else printf("NO BALL\n");
         }
 
         const char* root_path="/home/d402/hikvision_ros/img_cache/";
@@ -62,7 +65,7 @@ void HikvisionCamera::decodeCallback(int nPort, char *pBuf, int nSize, FRAME_INF
         // sprintf(path,"%s%d%s",root_path,idx,ext);
         const char* imgname="tmp.jpg";
         sprintf(path,"%s%s",root_path,imgname);
-        int x=rand()%16+1;
+        x=rand()%16+1;
         if(x==1) cv::imwrite(path,picBGR);
         #ifndef NDEBUG
             ROS_INFO("[%s] imwrite to %s",camera_name.c_str(),path);

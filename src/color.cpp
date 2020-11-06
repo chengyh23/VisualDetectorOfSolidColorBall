@@ -48,12 +48,12 @@ COLOR colorClassify(int r,int g, int b){
     float ratioB=(float)b/sum;
     float ratioY=(float)(r+g)/sum;
 
-    if(ratioY >= thY && ratioB<=thB) return YELLOW;
-    if(inRange(r,39-22*2,39+22*2)&&
-       inRange(g,140-24*2,140+24*2)&&
-       inRange(b,117-24*2,117+24*2)) return GREEN;
-    if(r<50 && g<50 && b<50) return BLACK;
     if((ratioR>=thR) && (ratioG<=thG) && (ratioB<=thB)) return RED;
+    if(ratioY >= thY && ratioB<=thB) return YELLOW;
+    if(inRange(r,12-10*2,12+10*2)&&
+       inRange(g,60-52*2,60+52*2)&&
+       inRange(b,66-40*2,66+40*2)) return GREEN;
+    if(r<30 && g<30 && b<30) return BLACK;
         // if((ratioR>=thR) && (ratioG<=thG) && (ratioB>=thB)) return PURPLE;
     else return UNDEFINED;
 }
