@@ -128,74 +128,88 @@ COLOR colorDetectBlock(Mat img,int offset_col,int offset_row){
     }
 }
 
-cv::Rect getColorCirclesRect(const std::vector<cv::Point> colorList){
-    // GRID数量太少则忽略
-    if(colorList.size()<NUM_GRIDS_THRESH) return cv::Rect();
-    std::vector<cv::Point> points=colorList;
-    std::vector<int> px,py;
-    for(int ii=0;ii<points.size();ii++){
-        px.push_back(points[ii].x);
-        py.push_back(points[ii].y);
-    }
-    // 去掉NUM_OUTIERS个最大最小值
-    for(int i=0;i<NUM_OUTLIERS;i++){
+std::vector<cv::Rect> getColorCirclesRect(const std::vector<std::vector<cv::Point>> colorList){
+    std::vector<cv::Rect> ret;
+    for(int j=0;j<colorList.size();j++){
+        // GRID数量太少则忽略
+        if(colorList[j].size()<NUM_GRIDS_THRESH){
+            ret.push_back(cv::Rect());
+            continue;
+        }
+        std::vector<cv::Point> points=colorList[j];
+        std::vector<int> px,py;
+        for(int ii=0;ii<points.size();ii++){
+            px.push_back(points[ii].x);
+            py.push_back(points[ii].y);
+        }
+        // 去掉NUM_OUTIERS个最大最小值
+        for(int i=0;i<NUM_OUTLIERS;i++){
+            int px_max, px_min, px_maxIdx, px_minIdx;
+            getMaxMin(px,px_max,px_min,px_maxIdx, px_minIdx);
+            px.erase(px.begin()+px_maxIdx);
+            px.erase(px.begin()+px_minIdx);
+            int py_max, py_min, py_maxIdx, py_minIdx;
+            getMaxMin(py,py_max,py_min,py_maxIdx, py_minIdx);
+            py.erase(py.begin()+py_maxIdx);
+            py.erase(py.begin()+py_minIdx);
+        }
         int px_max, px_min, px_maxIdx, px_minIdx;
         getMaxMin(px,px_max,px_min,px_maxIdx, px_minIdx);
-        px.erase(px.begin()+px_maxIdx);
-        px.erase(px.begin()+px_minIdx);
         int py_max, py_min, py_maxIdx, py_minIdx;
         getMaxMin(py,py_max,py_min,py_maxIdx, py_minIdx);
-        py.erase(py.begin()+py_maxIdx);
-        py.erase(py.begin()+py_minIdx);
-    }
-    int px_max, px_min, px_maxIdx, px_minIdx;
-    getMaxMin(px,px_max,px_min,px_maxIdx, px_minIdx);
-    int py_max, py_min, py_maxIdx, py_minIdx;
-    getMaxMin(py,py_max,py_min,py_maxIdx, py_minIdx);
-    // 点是GRID左上角坐标，目标框应包含至右下角
-    px_max +=1;
-    py_max +=1;
-    Point p1((px_min-2)*GRID_WIDTH,(py_min-2)*GRID_HEIGHT); // topleft
-    Point p2((px_max+2)*GRID_WIDTH,(py_max+2)*GRID_HEIGHT); // bottomright
-    // rectangle如果长宽比太大认为它不是球，过滤掉
-    float aspect_ratio=((float)(px_max-px_min)/(py_max-py_min));
-    aspect_ratio = (aspect_ratio)>1 ? aspect_ratio : (1/aspect_ratio);
-    if(aspect_ratio < ASPECTRATIO_THRESH){
-        return cv::Rect(p1.x,p1.y,p2.x-p1.x,p2.y-p1.y);
-    }else{
-        return cv::Rect();
-    }
-}
-void drawColorCirclesRect(Mat& img,cv::Rect rect,COLOR c){
-    if(rect==cv::Rect()) return;
-    cv::Point p1(rect.x,rect.y);
-    cv::Point p2(rect.x+rect.width,rect.y+rect.height);
-    switch (c){
-        case 0://YELLOW
-            cv::rectangle(img,p1,p2,Scalar(100,100,100),2,LINE_AA);break;
-        case 1://GREEN
-            cv::rectangle(img,p1,p2,Scalar(0,255,0),2,LINE_AA);break;
-        case 2://BLACK
-            cv::rectangle(img,p1,p2,Scalar(0,0,0),2,LINE_AA);break;
-        case 3://RED
-            cv::rectangle(img,p1,p2,Scalar(0,0,255),2,LINE_AA);break;
-    }
-}
-void drawBlockColorCircle(Mat& img,const std::vector<cv::Point> colorList,COLOR c){
-    for(int i=0;i<colorList.size();i++){
-        int ii=colorList[i].x;
-        int jj=colorList[i].y;
-        switch (c){
-            case 0://YELLOW
-                circle(img,cv::Point(ii*GRID_WIDTH,jj*GRID_HEIGHT),10,Scalar(100,100,100),2);break;
-            case 1://GREEN
-                circle(img,cv::Point(ii*GRID_WIDTH,jj*GRID_HEIGHT),10,Scalar(0,255,0),2);break;
-            case 2://BLACK
-                circle(img,cv::Point(ii*GRID_WIDTH,jj*GRID_HEIGHT),10,Scalar(0,0,0),2);break;
-            case 3://RED
-                circle(img,cv::Point(ii*GRID_WIDTH,jj*GRID_HEIGHT),10,Scalar(0,0,255),2);break;
+        // 点是GRID左上角坐标，目标框应包含至右下角
+        px_max +=1;
+        py_max +=1;
+        Point p1((px_min-2)*GRID_WIDTH,(py_min-2)*GRID_HEIGHT); // topleft
+        Point p2((px_max+2)*GRID_WIDTH,(py_max+2)*GRID_HEIGHT); // bottomright
+        // rectangle如果长宽比太大认为它不是球，过滤掉
+        float aspect_ratio=((float)(px_max-px_min)/(py_max-py_min));
+        aspect_ratio = (aspect_ratio)>1 ? aspect_ratio : (1/aspect_ratio);
+        if(aspect_ratio < ASPECTRATIO_THRESH){
+            ret.push_back(cv::Rect(p1.x,p1.y,p2.x-p1.x,p2.y-p1.y));
+        }else{
+            ret.push_back(cv::Rect());
         }
     }
+    return ret;
+}
+void drawColorCirclesRects(Mat& img,std::vector<cv::Rect> rects){
+    for(int c=0;c<rects.size();c++){
+        cv::Rect rect = rects[c];
+        if(rect==cv::Rect()) continue;
+        cv::Point p1(rect.x,rect.y);
+        cv::Point p2(rect.x+rect.width,rect.y+rect.height);
+        switch (c){
+            case 0://YELLOW
+                cv::rectangle(img,p1,p2,Scalar(100,100,100),2,LINE_AA);break;
+            case 1://GREEN
+                cv::rectangle(img,p1,p2,Scalar(0,255,0),2,LINE_AA);break;
+            case 2://BLACK
+                cv::rectangle(img,p1,p2,Scalar(0,0,0),2,LINE_AA);break;
+            case 3://RED
+                cv::rectangle(img,p1,p2,Scalar(0,0,255),2,LINE_AA);break;
+        }
+    }
+
+}
+void drawBlockColorCircle(Mat& img,const std::vector<std::vector<cv::Point>> colorList){
+    for(int c=0;c<colorList.size();c++){
+        for(int i=0;i<colorList[c].size();i++){
+            int ii=colorList[c][i].x;
+            int jj=colorList[c][i].y;
+            switch (c){
+                case 0://YELLOW
+                    circle(img,cv::Point(ii*GRID_WIDTH,jj*GRID_HEIGHT),10,Scalar(100,100,100),2);break;
+                case 1://GREEN
+                    circle(img,cv::Point(ii*GRID_WIDTH,jj*GRID_HEIGHT),10,Scalar(0,255,0),2);break;
+                case 2://BLACK
+                    circle(img,cv::Point(ii*GRID_WIDTH,jj*GRID_HEIGHT),10,Scalar(0,0,0),2);break;
+                case 3://RED
+                    circle(img,cv::Point(ii*GRID_WIDTH,jj*GRID_HEIGHT),10,Scalar(0,0,255),2);break;
+            }
+        }
+    }
+
 }
 std::vector<std::vector<Point>> colorDetect(Mat& img){
     // YGBR

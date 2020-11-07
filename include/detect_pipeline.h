@@ -7,8 +7,14 @@
 #include "../include/color.h"
 #include "../include/seaskyline.h"
 #include "../include/shape.h"
-bool CIRCLEDETECT= false;
 
-void detect_pipeline(cv::Mat& img);
+
+bool DRAW_BLOCK_COLOR_CIRCLE= false;
+bool SHAPE_CIRCLE_DETECT= true;
+bool DRAW_SHAPE_CIRCLE= true;
+
+
+
+COLOR detect_pipeline(cv::Mat& img);
 
 #endif //HIKVISION_ROS_DETECT_PIPELINE_H

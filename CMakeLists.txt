@@ -61,8 +61,9 @@ add_executable(localtest src/localtest.cpp)
 target_link_libraries(localtest color kmeans seaskyline shape detect_pipeline)
 add_executable(shapetest src/shapetest.cpp)
 target_link_libraries(shapetest shape)
-add_executable(colortest src/colortest.cpp)
-target_link_libraries(colortest color)
+add_executable(ADItest src/ADItest.cpp)
+target_link_libraries(ADItest ${OpenCV_LIBS})
+
 
 add_executable(hik_cam_node node/hik_cam_node.cpp)
-target_link_libraries(hik_cam_node hik_cam color kmeans seaskyline)
+target_link_libraries(hik_cam_node hik_cam color kmeans seaskyline detect_pipeline)

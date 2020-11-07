@@ -13,6 +13,7 @@
 #include "hikvision_sdk/error.h"
 
 #include <ros/ros.h>
+#include <turtlesim/Color.h>
 #include <sensor_msgs/Image.h>
 #include <opencv2/opencv.hpp>
 #include <cv_bridge/cv_bridge.h>
@@ -24,7 +25,7 @@
 class HikvisionCamera
 {
 private:
-
+    ros::Publisher color_pub;
     /// ros parameters
     image_transport::CameraPublisher image_pub;
     std::shared_ptr<camera_info_manager::CameraInfoManager> camera_info_mgr;

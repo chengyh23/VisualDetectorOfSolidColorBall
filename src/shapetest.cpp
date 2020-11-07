@@ -1,5 +1,5 @@
 // Test shape detect separately
-#include "shape.h"
+#include "../include/shape.h"
 
 int main(int argc,char* argv[]){
     if(argc<2){
@@ -27,14 +27,14 @@ int main(int argc,char* argv[]){
         }else{
             std::cout<<std::endl;
         }
-        std::vector<cv::Vec3f> circles = circleDetect(img);
-        for(int i=0;i<circles.size();i++){
-            CvPoint center(circles[i][0],circles[i][1]);
-            cv::circle(img,center,circles[i][2],CvScalar(0,0,255),1,cv::LINE_AA,0);
-        }
-        
+        //--------------------
+        cv::Mat edge;
+        cv::Sobel(img,edge,-1,0,1);
+        cv::Mat bf;
+        cv::bilateralFilter(edge,bf, 10, SIGMACOLOR, SIGMASPACE);
+
         cv::namedWindow("shape",0);
-        cv::imshow("shape",img);cv::waitKey(0);// 毫秒
+        cv::imshow("shape",bf);cv::waitKey(0);// 毫秒
     }
     
 }

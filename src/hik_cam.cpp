@@ -2,6 +2,7 @@
 #include "color.h"
 #include "seaskyline.h"
 #include "kmeans_minibatch.h"
+#include "../include/detect_pipeline.h"
 
 std::string HikvisionCamera::expandUserPath(std::string path)
 {
@@ -28,66 +29,28 @@ void HikvisionCamera::decodeCallback(int nPort, char *pBuf, int nSize, FRAME_INF
 
     if (lFrameType == T_YV12)
     {
+        int x=rand()%16+1;
+        if(x!=1) return;
 
         cv::Mat picBGR;
         cv::Mat picYV12 = cv::Mat(pFrameInfo->nHeight * 3/2, pFrameInfo->nWidth, CV_8UC1, pBuf);
         cv::cvtColor(picYV12, picBGR, cv::COLOR_YUV2BGR_YV12);
-
-        int x=rand()%16+1;
-        if(x!=1) return;
-        if(x==1){
-            // 海天线检测
-            cv::Point h1(0, 0), h2(0, 0);
-            find_horinzon_line(picBGR, 0, 0.0, 2.0, h1, h2);
-            cv::line(picBGR,h1,h2,Scalar(255,0,0),2,cv::LINE_AA);
-            // 检测颜色，返回colorList
-            std::vector<std::vector<Point>> colorList = colorDetect(picBGR);
-            // 根据海天线过滤colorList，得到colorListFiltered
-            std::vector<std::vector<Point>> colorListFilered;
-            for(int i=0;i<colorList.size();i++){
-                std::vector<Point> colorPoints = filterByLine(h1,h2,colorList[i]);
-                colorListFilered.push_back(colorPoints);
-            }
-            // 利用colorListFiltered
-            int flag=0;
-            char outcolorstr[256]={0};
-            for(int i=0;i<colorListFilered.size();i++){
-                drawBlockColorCircle(picBGR,colorListFilered[i],COLOR(i));
-                cv::Rect roi_rect = getColorCirclesRect(colorListFilered[i]);
-                drawColorCirclesRect(picBGR,roi_rect,COLOR(i));
-                if(roi_rect!=cv::Rect()){
-                    flag=1;
-                    switch (i) {
-                        case YELLOW:
-                            sprintf(outcolorstr,"YELLOW  ");break;
-                        case GREEN:
-                            sprintf(outcolorstr,"GREEN   ");break;
-                        case BLACK:
-                            sprintf(outcolorstr,"BLACK   ");break;
-                        case RED:
-                            sprintf(outcolorstr,"RED ");break;
-                        
-                    }
-                }
-
-            }
-            
-            if(flag==0) ROS_INFO("NO BALL");
-            else ROS_INFO(outcolorstr);
+        COLOR c = detect_pipeline(picBGR);
+        turtlesim::Color color_msg;
+        switch (c){
+            case 0://YELLOW
+                color_msg.r=0;color_msg.g=0;color_msg.b=0;break;
+            case 1://GREEN
+                color_msg.r=0;color_msg.g=1;color_msg.b=0;break;
+            case 2://BLACK
+                color_msg.r=0;color_msg.g=0;color_msg.b=1;break;
+            case 3://RED
+                color_msg.r=1;color_msg.g=0;color_msg.b=0;break;
+            default:
+                color_msg.r=0;color_msg.g=0;color_msg.b=0;
         }
+        color_pub.publish(color_msg);
 
-        const char* root_path="/home/d402/hikvision_ros/img_cache/";
-        char path[256]={0};
-        // int idx=25;
-        // sprintf(path,"%s%d%s",root_path,idx,ext);
-        const char* imgname="tmp.jpg";
-        sprintf(path,"%s%s",root_path,imgname);
-        x=rand()%16+1;
-        if(x==1) cv::imwrite(path,picBGR);
-        #ifndef NDEBUG
-            ROS_INFO("[%s] imwrite to %s",camera_name.c_str(),path);
-        #endif
-        
         sensor_msgs::CameraInfoPtr ci(new sensor_msgs::CameraInfo(camera_info_mgr->getCameraInfo()));
         ci->header = camera_info_mgr->getCameraInfo().header;
         ci->header.stamp = ros::Time::now();
@@ -341,7 +304,7 @@ void HikvisionCamera::initROSIO(ros::NodeHandle& priv_node)
         camera_info_mgr->setCameraInfo(camera_info);
     }
 
-
+    color_pub = priv_node.advertise<turtlesim::Color>("/ballcolor",1) ;
     image_transport::ImageTransport it(priv_node);
     image_pub = it.advertiseCamera(camera_name, 1);
 
