@@ -11,7 +11,7 @@
 
 bool DRAW_BLOCK_COLOR_CIRCLE= false;
 bool SHAPE_CIRCLE_DETECT= true;
-bool DRAW_SHAPE_CIRCLE= true;
+bool DRAW_SHAPE_CIRCLE= false;
 
 
 

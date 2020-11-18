@@ -5,8 +5,7 @@
 #ifndef HIKVISION_ROS_DETECT_PARAMS_H
 #define HIKVISION_ROS_DETECT_PARAMS_H
 #include <opencv2/opencv.hpp>
-// 1440/1080 = 4/3
-// 40x30
+
 int WIDTH = 2560;
 int HEIGHT = 1440;
 //int WIDTH = 1440;

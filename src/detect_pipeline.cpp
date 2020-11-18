@@ -14,7 +14,7 @@ COLOR detect_pipeline(cv::Mat& img){
         std::vector<Point> colorPoints = filterByLine(h1,h2,colorList[i]);
         colorListFilered.push_back(colorPoints);
     }
-    std::vector<cv::Rect> roi_rects = getColorCirclesRect(colorListFilered);
+    std::vector<cv::Rect> roi_rects = getColorCirclesRect(h1,h2,colorListFilered);
     int maxArea=0;COLOR ret=UNDEFINED;
     std::vector<std::vector<cv::Vec3f>> circles;
     for(int i=0;i<colorListFilered.size();i++){

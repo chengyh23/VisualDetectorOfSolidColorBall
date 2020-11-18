@@ -97,7 +97,7 @@ COLOR colorClassify(int r,int g, int b){
 // 每个block颜色判断
 COLOR colorDetectBlock(Mat img,int offset_col,int offset_row){
     int nYGBR[4]= {0,0,0,0};
-    for(int j=offset_row;j<offset_row+GRID_HEIGHT;j++){      //忽略图像底部
+    for(int j=offset_row;j<offset_row+GRID_HEIGHT;j++){
         for(int i=offset_col;i<offset_col+GRID_WIDTH;i++){
             Vec3b pixel;
             pixel=img.at<Vec3b>(j,i);
@@ -128,7 +128,7 @@ COLOR colorDetectBlock(Mat img,int offset_col,int offset_row){
     }
 }
 
-std::vector<cv::Rect> getColorCirclesRect(const std::vector<std::vector<cv::Point>> colorList){
+std::vector<cv::Rect> getColorCirclesRect(cv::Point h1,cv::Point h2,const std::vector<std::vector<cv::Point>> colorList){
     std::vector<cv::Rect> ret;
     for(int j=0;j<colorList.size();j++){
         // GRID数量太少则忽略
@@ -165,7 +165,13 @@ std::vector<cv::Rect> getColorCirclesRect(const std::vector<std::vector<cv::Poin
         // rectangle如果长宽比太大认为它不是球，过滤掉
         float aspect_ratio=((float)(px_max-px_min)/(py_max-py_min));
         aspect_ratio = (aspect_ratio)>1 ? aspect_ratio : (1/aspect_ratio);
-        if(aspect_ratio < ASPECTRATIO_THRESH){
+        // 矩形最上方距离海天线大于图像高度的1/6，过滤
+        float dist2seaskyline;
+        if(h1.y==0 ||h2.y==0)  dist2seaskyline = -1; // 若未检测到海天线，这条规则自然是用不了的
+        else dist2seaskyline= p1.y - (h1.y+h2.y)/2;
+        // 矩形最上方如果在图像高度的下1/4之下，过滤
+        int dist2bottom=HEIGHT - p1.y;
+        if(aspect_ratio < ASPECTRATIO_THRESH && dist2seaskyline<HEIGHT/6 && dist2bottom>HEIGHT/4){
             ret.push_back(cv::Rect(p1.x,p1.y,p2.x-p1.x,p2.y-p1.y));
         }else{
             ret.push_back(cv::Rect());

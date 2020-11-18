@@ -40,7 +40,8 @@ int main(int argc,char* argv[])
         }else{
             cout<<endl;
         }
-        detect_pipeline(img);
+        COLOR c = detect_pipeline(img);
+        printf("%d\n",(int)c);
         cv::Mat tmp;
         cv::resize(img,tmp,cv::Size (1280,720));
 

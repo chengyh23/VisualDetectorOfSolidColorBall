@@ -1,0 +1,8 @@
+prefix=/home/chengyh23/visual/build/devel
+
+Name: hikvision_ros
+Description: Description of hikvision_ros
+Version: 0.0.1
+Cflags: -I/home/chengyh23/visual/include
+Libs: -L${prefix}/lib 
+Requires: 
