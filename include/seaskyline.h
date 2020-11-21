@@ -1,6 +1,6 @@
 #ifndef SEASKYLINE_H
 #define SEASKYLINE_H
-#include "../include/detect_params.h"
+#include "../include/params.h"
 #include <opencv2/opencv.hpp>
 #include <math.h>
 #include <vector>

@@ -50,6 +50,9 @@ void HikvisionCamera::decodeCallback(int nPort, char *pBuf, int nSize, FRAME_INF
 detect_pipeline.h中定义是否画block颜色检测、矩形框、形状的圆形检测
 
 ## DEBUG 改参数
+
+params.h
+
 **颜色统计值** src/color.cpp--colorClassify
 
 ## DEBUG 可执行文件

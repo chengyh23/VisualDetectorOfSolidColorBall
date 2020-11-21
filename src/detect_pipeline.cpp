@@ -23,7 +23,7 @@ COLOR detect_pipeline(cv::Mat& img){
             maxArea = roi_rect.area();
             ret = COLOR(i);
         }
-        if(SHAPE_CIRCLE_DETECT && !roi_rect.empty()){
+        if(SHAPE_CIRCLE_DETECT && roi_rect!=cv::Rect()){
             std::vector<cv::Vec3f> circle = circleDetect(img,roi_rect);
             circles.push_back(circle);
         }else{

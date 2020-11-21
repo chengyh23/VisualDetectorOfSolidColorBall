@@ -9,12 +9,6 @@
 #include "../include/shape.h"
 
 
-bool DRAW_BLOCK_COLOR_CIRCLE= true;
-bool SHAPE_CIRCLE_DETECT= true;
-bool DRAW_SHAPE_CIRCLE= false;
-
-
-
 COLOR detect_pipeline(cv::Mat& img);
 
 #endif //HIKVISION_ROS_DETECT_PIPELINE_H

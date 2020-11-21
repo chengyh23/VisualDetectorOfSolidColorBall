@@ -84,12 +84,12 @@ COLOR colorClassify(int r,int g, int b){
 
     if((ratioR>=thR) && (ratioG<=thG) && (ratioB<=thB)) return RED;
     if(ratioY >= thY && ratioB<=thB) return YELLOW;
-    if(inRange(r,35-12*2,35+12*2)&&
-       inRange(g,40-9*2,40+9*2)&&
-       inRange(b,50-9*2,50+9*2)) return BLACK;
-    if(inRange(r,0-2*2,0+2*2)&&
-       inRange(g,200-18*2,200+18*2)&&
-       inRange(b,80-20*2,80+20*2)&&
+    if(inRange(r,BLACK_R_MEAN - BLACK_R_STDERR*2,BLACK_R_MEAN + BLACK_R_STDERR*2)&&
+       inRange(g,BLACK_G_MEAN - BLACK_G_STDERR*2,BLACK_G_MEAN + BLACK_G_STDERR*2)&&
+       inRange(b,BLACK_B_MEAN - BLACK_B_STDERR*2,BLACK_B_MEAN + BLACK_B_STDERR*2)) return BLACK;
+    if(inRange(r,GREEN_R_MEAN - GREEN_R_STDERR*2,GREEN_R_MEAN + GREEN_R_STDERR*2)&&
+       inRange(g,GREEN_G_MEAN - GREEN_G_STDERR*2,GREEN_G_MEAN + GREEN_G_STDERR*2)&&
+       inRange(b,GREEN_B_MEAN - GREEN_B_STDERR*2,GREEN_B_MEAN + GREEN_B_STDERR*2)&&
        ratioG>0.6) return GREEN;
 
         // if((ratioR>=thR) && (ratioG<=thG) && (ratioB>=thB)) return PURPLE;
