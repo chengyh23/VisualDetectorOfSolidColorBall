@@ -9,7 +9,7 @@
 using namespace cv;
 enum COLOR{YELLOW,GREEN,BLACK,RED,UNDEFINED};
 double thR=0.4;
-double thY=0.85;
+double thY=0.9;
 double thG=0.3;
 double thB=0.3;
 int STDERR_THRESH=10;//100

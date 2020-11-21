@@ -49,14 +49,28 @@ void HikvisionCamera::decodeCallback(int nPort, char *pBuf, int nSize, FRAME_INF
 
 detect_pipeline.h中定义是否画block颜色检测、矩形框、形状的圆形检测
 
+## DEBUG 改参数
+**颜色统计值** src/color.cpp--colorClassify
+
 ## DEBUG 可执行文件
 在visual/build/devel/lib/hikvision_ros/文件夹下可以看到编译出来的几个executable：
 
-***localtest***
+**localtest**
 
-src/localtest.cpp中：decodeCallback--detect_pipeline
+涉及主要的函数调用为：src/localtest.cpp中：decodeCallback--detect_pipeline
 
-***hik_cam_node***
+使用方法：
+
+首先 图像所在文件夹下生成imgs.txt
+```shell script
+ls *.jpg > imgs.txt
+```
+然后 在visual/build/devel/lib/hikvision_ros/下执行
+```shell scripth
+./localtest path/to/images/
+```
+
+**hik_cam_node**
 
 src/hik_cam.cpp中：decodeCallback--detect_pipeline
 
@@ -144,5 +158,3 @@ then begin calibration. After calibration you straightly press **commit** button
 #[ INFO] [1551582484.454024618]: New camera info received
 #[ INFO] [1551582484.454296067]: [ hik_camera ] Write camera_info to ~/.ros/camera_info/hik_camera.yaml success.
 ```
-
-# visual

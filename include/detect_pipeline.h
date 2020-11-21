@@ -9,7 +9,7 @@
 #include "../include/shape.h"
 
 
-bool DRAW_BLOCK_COLOR_CIRCLE= false;
+bool DRAW_BLOCK_COLOR_CIRCLE= true;
 bool SHAPE_CIRCLE_DETECT= true;
 bool DRAW_SHAPE_CIRCLE= false;
 

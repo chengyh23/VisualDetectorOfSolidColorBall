@@ -84,10 +84,12 @@ COLOR colorClassify(int r,int g, int b){
 
     if((ratioR>=thR) && (ratioG<=thG) && (ratioB<=thB)) return RED;
     if(ratioY >= thY && ratioB<=thB) return YELLOW;
-    if(r<30 && g<30 && b<30) return BLACK;
-    if(inRange(r,12-10*2,12+10*2)&&
-       inRange(g,60-52*2,60+52*2)&&
-       inRange(b,66-40*2,66+40*2)&&
+    if(inRange(r,35-12*2,35+12*2)&&
+       inRange(g,40-9*2,40+9*2)&&
+       inRange(b,50-9*2,50+9*2)) return BLACK;
+    if(inRange(r,0-2*2,0+2*2)&&
+       inRange(g,200-18*2,200+18*2)&&
+       inRange(b,80-20*2,80+20*2)&&
        ratioG>0.6) return GREEN;
 
         // if((ratioR>=thR) && (ratioG<=thG) && (ratioB>=thB)) return PURPLE;
@@ -205,13 +207,13 @@ void drawBlockColorCircle(Mat& img,const std::vector<std::vector<cv::Point>> col
             int jj=colorList[c][i].y;
             switch (c){
                 case 0://YELLOW
-                    circle(img,cv::Point(ii*GRID_WIDTH,jj*GRID_HEIGHT),10,Scalar(100,100,100),2);break;
+                    circle(img,cv::Point(ii*GRID_WIDTH,jj*GRID_HEIGHT),6,Scalar(100,100,100),2);break;
                 case 1://GREEN
-                    circle(img,cv::Point(ii*GRID_WIDTH,jj*GRID_HEIGHT),10,Scalar(0,255,0),2);break;
+                    circle(img,cv::Point(ii*GRID_WIDTH,jj*GRID_HEIGHT),6,Scalar(0,255,0),2);break;
                 case 2://BLACK
-                    circle(img,cv::Point(ii*GRID_WIDTH,jj*GRID_HEIGHT),10,Scalar(0,0,0),2);break;
+                    circle(img,cv::Point(ii*GRID_WIDTH,jj*GRID_HEIGHT),6,Scalar(0,0,0),2);break;
                 case 3://RED
-                    circle(img,cv::Point(ii*GRID_WIDTH,jj*GRID_HEIGHT),10,Scalar(0,0,255),2);break;
+                    circle(img,cv::Point(ii*GRID_WIDTH,jj*GRID_HEIGHT),6,Scalar(0,0,255),2);break;
             }
         }
     }
