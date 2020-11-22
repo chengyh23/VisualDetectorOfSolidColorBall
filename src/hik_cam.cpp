@@ -23,34 +23,38 @@ std::string HikvisionCamera::expandUserPath(std::string path)
     return path;
 }
     
+int counter = 0;
+int counter_g = 0;
+int counter_b = 0;
 void HikvisionCamera::decodeCallback(int nPort, char *pBuf, int nSize, FRAME_INFO *pFrameInfo)
 {
     int lFrameType = pFrameInfo->nType;
 
     if (lFrameType == T_YV12)
     {
-        int x=rand()%16+1;
+        int x=rand() % 5+1;
         if(x!=1) return;
 
+        counter++;
         cv::Mat picBGR;
         cv::Mat picYV12 = cv::Mat(pFrameInfo->nHeight * 3/2, pFrameInfo->nWidth, CV_8UC1, pBuf);
         cv::cvtColor(picYV12, picBGR, cv::COLOR_YUV2BGR_YV12);
         COLOR c = detect_pipeline(picBGR);
-        turtlesim::Color color_msg;
         switch (c){
-            case 0://YELLOW
-                color_msg.r=0;color_msg.g=0;color_msg.b=0;break;
-            case 1://GREEN
-                color_msg.r=0;color_msg.g=1;color_msg.b=0;break;
-            case 2://BLACK
-                color_msg.r=0;color_msg.g=0;color_msg.b=1;break;
-            case 3://RED
-                color_msg.r=1;color_msg.g=0;color_msg.b=0;break;
-            default:
-                color_msg.r=0;color_msg.g=0;color_msg.b=0;
+        case 1:
+            counter_g++;break;
+        case 2:
+            counter_b++;break;
         }
-        color_pub.publish(color_msg);
-
+        if(counter==5){
+            turtlesim::Color color_msg;
+            color_msg.r=0;
+            color_msg.g=counter_g;
+            color_msg.b=counter_b;
+            color_pub.publish(color_msg);
+            counter = counter_g = counter_b = 0;
+        }
+        
         sensor_msgs::CameraInfoPtr ci(new sensor_msgs::CameraInfo(camera_info_mgr->getCameraInfo()));
         ci->header = camera_info_mgr->getCameraInfo().header;
         ci->header.stamp = ros::Time::now();
