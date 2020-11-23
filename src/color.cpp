@@ -87,10 +87,21 @@ COLOR colorClassify(int r,int g, int b){
     if(inRange(r,BLACK_R_MEAN - BLACK_R_STDERR*2,BLACK_R_MEAN + BLACK_R_STDERR*2)&&
        inRange(g,BLACK_G_MEAN - BLACK_G_STDERR*2,BLACK_G_MEAN + BLACK_G_STDERR*2)&&
        inRange(b,BLACK_B_MEAN - BLACK_B_STDERR*2,BLACK_B_MEAN + BLACK_B_STDERR*2)) return BLACK;
-    if(inRange(r,GREEN_R_MEAN - GREEN_R_STDERR*2,GREEN_R_MEAN + GREEN_R_STDERR*2)&&
-       inRange(g,GREEN_G_MEAN - GREEN_G_STDERR*2,GREEN_G_MEAN + GREEN_G_STDERR*2)&&
-       inRange(b,GREEN_B_MEAN - GREEN_B_STDERR*2,GREEN_B_MEAN + GREEN_B_STDERR*2)&&
-       ratioG>0.6) return GREEN;
+    if(ratioG>0.6
+        && (
+       (inRange(r,LIGHT_GREEN_R_MEAN - LIGHT_GREEN_R_STDERR*2,LIGHT_GREEN_R_MEAN + LIGHT_GREEN_R_STDERR*2)&&
+        inRange(g,LIGHT_GREEN_G_MEAN - LIGHT_GREEN_G_STDERR*2,LIGHT_GREEN_G_MEAN + LIGHT_GREEN_G_STDERR*2)&&
+        inRange(b,LIGHT_GREEN_B_MEAN - LIGHT_GREEN_B_STDERR*2,LIGHT_GREEN_B_MEAN + LIGHT_GREEN_B_STDERR*2))
+        ||
+       (inRange(r,DARK_GREEN_R_MEAN  - DARK_GREEN_R_STDERR *2,DARK_GREEN_R_MEAN  + DARK_GREEN_R_STDERR *2)&&
+        inRange(g,DARK_GREEN_G_MEAN  - DARK_GREEN_G_STDERR *2,DARK_GREEN_G_MEAN  + DARK_GREEN_G_STDERR *2)&&
+        inRange(b,DARK_GREEN_B_MEAN  - DARK_GREEN_B_STDERR *2,DARK_GREEN_B_MEAN  + DARK_GREEN_B_STDERR *2))
+        )
+       ) return GREEN;
+    // if(inRange(r,GREEN_R_MEAN - GREEN_R_STDERR*2,GREEN_R_MEAN + GREEN_R_STDERR*2)&&
+    //    inRange(g,GREEN_G_MEAN - GREEN_G_STDERR*2,GREEN_G_MEAN + GREEN_G_STDERR*2)&&
+    //    inRange(b,GREEN_B_MEAN - GREEN_B_STDERR*2,GREEN_B_MEAN + GREEN_B_STDERR*2)&&
+    //    ratioG>0.6) return GREEN;
 
         // if((ratioR>=thR) && (ratioG<=thG) && (ratioB>=thB)) return PURPLE;
     else return UNDEFINED;
@@ -167,13 +178,29 @@ std::vector<cv::Rect> getColorCirclesRect(cv::Point h1,cv::Point h2,const std::v
         // rectangle如果长宽比太大认为它不是球，过滤掉
         float aspect_ratio=((float)(px_max-px_min)/(py_max-py_min));
         aspect_ratio = (aspect_ratio)>1 ? aspect_ratio : (1/aspect_ratio);
-        // 矩形最上方距离海天线大于图像高度的1/6，过滤
-        float dist2seaskyline;
-        if(h1.y==0 ||h2.y==0)  dist2seaskyline = -1; // 若未检测到海天线，这条规则自然是用不了的
-        else dist2seaskyline= p1.y - (h1.y+h2.y)/2;
-        // 矩形最上方如果在图像高度的下1/4之下，过滤
-        int dist2bottom=HEIGHT - p1.y;
-        if(aspect_ratio < ASPECTRATIO_THRESH && dist2seaskyline<HEIGHT/6 && dist2bottom>HEIGHT/4){
+        
+        // 矩形最上方與海天线的距離
+        float dist_up2seaskyline;   
+        if(h1.y==0 ||h2.y==0)  dist_up2seaskyline = -1; // 若未检测到海天线，矩形最上方與海天线的距離設爲無效值
+        else dist_up2seaskyline= p1.y - (h1.y+h2.y)/2;
+        // 矩形最上方與圖像底部的距離
+        int dist_up2floor=HEIGHT - p1.y;
+        // 矩形最上方與圖像頂部的距離
+        int dist_up2ceil=p1.y;
+        // 矩形最下方與海天線的距離
+        int dist_down2seaskyline;
+        if(h1.y==0 ||h2.y==0)  dist_down2seaskyline = 1;
+        else dist_down2seaskyline=(h1.y+h2.y)/2 - p2.y;
+        // 矩形最下方與圖像頂部的距離
+        int dist_down2ceil=p2.y;
+
+        if(aspect_ratio < ASPECTRATIO_THRESH && 
+            dist_up2seaskyline  < HEIGHT/6 &&      // 矩形最上方與海天线距离大于图像高度的1/6，过滤
+            dist_up2floor       > HEIGHT/4 &&      // 矩形最上方與圖像底部的距離小於图像高度的1/4，过滤
+            dist_up2ceil        > HEIGHT/4 &&      // 矩形最上方與圖像頂部的距離小於圖像高度的1/4，過濾
+            dist_down2seaskyline< 0        &&      // 矩形最下方在海天線的上方，過濾
+            dist_down2ceil      > HEIGHT/2         // 矩形最下方與圖像頂部的距離小於圖像距離的1/2，過濾
+            ){
             ret.push_back(cv::Rect(p1.x,p1.y,p2.x-p1.x,p2.y-p1.y));
         }else{
             ret.push_back(cv::Rect());

@@ -32,9 +32,9 @@ COLOR detect_pipeline(cv::Mat& img){
         }
     }
     // (draw)visualization
-    cv::line(img,h1,h2,Scalar(255,0,0),2,cv::LINE_AA);
+    if(DRAW_SEASKYLINE) cv::line(img,h1,h2,Scalar(255,0,0),2,cv::LINE_AA);
     if(DRAW_BLOCK_COLOR_CIRCLE) drawBlockColorCircle(img,colorListFilered);
-    drawColorCirclesRects(img,roi_rects);
+    if(DRAW_COLOR_CIRCLES_RECTS) drawColorCirclesRects(img,roi_rects);
     if(DRAW_SHAPE_CIRCLE) drawShapeCircle(img,circles);
 
     return ret;

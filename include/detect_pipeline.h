@@ -4,6 +4,7 @@
 
 #ifndef HIKVISION_ROS_DETECT_PIPELINE_H
 #define HIKVISION_ROS_DETECT_PIPELINE_H
+#include "../include/params.h"
 #include "../include/color.h"
 #include "../include/seaskyline.h"
 #include "../include/shape.h"

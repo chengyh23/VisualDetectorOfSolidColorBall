@@ -24,6 +24,7 @@ std::string HikvisionCamera::expandUserPath(std::string path)
 }
     
 int counter = 0;
+int counter_r = 0;
 int counter_g = 0;
 int counter_b = 0;
 void HikvisionCamera::decodeCallback(int nPort, char *pBuf, int nSize, FRAME_INFO *pFrameInfo)
@@ -45,14 +46,16 @@ void HikvisionCamera::decodeCallback(int nPort, char *pBuf, int nSize, FRAME_INF
             counter_g++;break;
         case 2:
             counter_b++;break;
+        case 3:
+            counter_r++;break;
         }
         if(counter==5){
             turtlesim::Color color_msg;
-            color_msg.r=0;
+            color_msg.r=counter_r;
             color_msg.g=counter_g;
             color_msg.b=counter_b;
             color_pub.publish(color_msg);
-            counter = counter_g = counter_b = 0;
+            counter = counter_g = counter_b = counter_r = 0;
         }
         
         sensor_msgs::CameraInfoPtr ci(new sensor_msgs::CameraInfo(camera_info_mgr->getCameraInfo()));

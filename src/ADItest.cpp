@@ -13,27 +13,27 @@ int main(int argc,char* argv[]){
         std::cout<<"no input imgs list"<<std::endl;
         return 0;
     }
-    std::string imgname0;
-    getline(file,imgname0);
-    if(imgname0.empty()) return 0;
-    cv::Mat img0 = cv::imread(filePath+imgname0);
-    std::string imgname1;
-    while(getline(file,imgname1))
+    std::string imgname;
+    // getline(file,imgname0);
+    // if(imgname0.empty()) return 0;
+    // cv::Mat img0 = cv::imread(filePath+imgname0);
+    // std::string imgname1;
+    while(getline(file,imgname))
     {
-        if(imgname1.empty())
+        if(imgname.empty())
             continue;
-        cv::Mat img1 = cv::imread(filePath+imgname1);
-        std::cout<<imgname1;
+        cv::Mat img1 = cv::imread(filePath+imgname);
+        std::cout<<imgname;
         if(img1.empty()){
             std::cout<<" failed to read / empty"<<std::endl;
             break;
         }else{
             std::cout<<std::endl;
         }
-        cv::Mat DI=img1-img0;
-        cv::namedWindow("DI",0);
-        cv::imshow("DI",DI);cv::waitKey(0);// 毫秒
-        img0 = img1.clone();
+        // cv::Mat DI=img1-img0;
+        // cv::namedWindow("DI",0);
+        cv::imshow("DI",img1);cv::waitKey(0);// 毫秒
+        // img0 = img1.clone();
     }
 
 }
