@@ -1,3 +1,7 @@
+2020 ZhuHai WanShan International Intelligent Vessel Competition
+
+Yat-Sen Robot from SYSU 
+
 无人船比赛：检测球及其颜色
 
 （标签）一般使用只需看RELEASE ，调试需要参考DEBUG
